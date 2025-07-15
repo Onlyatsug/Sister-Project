@@ -1,4 +1,3 @@
-require("conf")
 
 Input = {}
 -- definindo variaveis de Input
@@ -12,23 +11,38 @@ local distantAttackInput
 local dashInput
 local healInput
 
+local camInput = {
+    x = 0,
+    y = 0
+}
+
 -- private functions
 function OnMove()
-    if love.keyboard.isDown("w") then
-        moveInput.y = -1
-    elseif love.keyboard.isDown("s") then
-        moveInput.y = 1 
-    else
-        moveInput.y = 0
+    local function getAxis(negKey, posKey)
+        if love.keyboard.isDown(negKey) and not love.keyboard.isDown(posKey) then
+            return -1
+        elseif love.keyboard.isDown(posKey) and not love.keyboard.isDown(negKey) then
+            return 1
+        else
+            return 0
+        end
     end
+    moveInput.x = getAxis("a", "d")
+    moveInput.y = getAxis("w", "s")
+end
 
-    if love.keyboard.isDown("a") then
-        moveInput.x = -1
-    elseif love.keyboard.isDown("d") then
-        moveInput.x = 1
-    else
-        moveInput.x = 0
+function OnCamMove()
+    local function getAxis(negKey, posKey)
+        if love.keyboard.isDown(negKey) and not love.keyboard.isDown(posKey) then
+            return -1
+        elseif love.keyboard.isDown(posKey) and not love.keyboard.isDown(negKey) then
+            return 1
+        else
+            return 0
+        end
     end
+    camInput.x = getAxis("left", "right")
+    camInput.y = getAxis("up", "down")
 end
 
 function OnJump()
@@ -76,6 +90,10 @@ function Input:GetMoveInput()
     return moveInput
 end
 
+function Input:GetCamInput()
+    return camInput
+end
+
 function Input:GetJumpInput()
     return jumpInput
 end
@@ -100,6 +118,7 @@ end
 -- funçao que atualiza as funções de Input a cada frame
 function Input:update(dt)
     OnMove()
+    OnCamMove()
     OnJump()
     OnAttack()
     OnDistantAttack()
